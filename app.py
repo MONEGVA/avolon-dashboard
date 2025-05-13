@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -23,9 +22,9 @@ if uploaded_file:
         amount_col = [col for col in expenses_df.columns if 'amount' in col.lower()]
         if amount_col:
             expenses_df['Amount'] = pd.to_numeric(expenses_df[amount_col[0]], errors='coerce')
-            monthly_expenses = expenses_df.dropna(subset=['Date', 'Amount']).groupby(
-                expenses_df['Date'].dt.to_period('M')
-            ).sum()['Amount']
+            expenses_df = expenses_df.dropna(subset=['Date', 'Amount'])
+            expenses_df['Month'] = expenses_df['Date'].dt.to_period('M')
+            monthly_expenses = expenses_df.groupby('Month')['Amount'].sum()
         else:
             monthly_expenses = pd.Series(dtype='float64')
 
@@ -33,9 +32,9 @@ if uploaded_file:
         wire_df.columns = ['Period', 'Date', 'Amount']
         wire_df['Date'] = pd.to_datetime(wire_df['Date'], errors='coerce')
         wire_df['Amount'] = pd.to_numeric(wire_df['Amount'], errors='coerce')
-        monthly_revenue = wire_df.dropna(subset=['Date', 'Amount']).groupby(
-            wire_df['Date'].dt.to_period('M')
-        ).sum()['Amount']
+        wire_df = wire_df.dropna(subset=['Date', 'Amount'])
+        wire_df['Month'] = wire_df['Date'].dt.to_period('M')
+        monthly_revenue = wire_df.groupby('Month')['Amount'].sum()
 
         # --- Scrap Analysis for Fast-Selling Parts & Margin ---
         scrap_df['QTY'] = pd.to_numeric(scrap_df['QTY'], errors='coerce')
